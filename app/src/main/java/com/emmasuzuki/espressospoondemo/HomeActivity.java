@@ -1,37 +1,37 @@
 package com.emmasuzuki.espressospoondemo;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 
-import java.io.IOException;
+import com.example.reusable_activities.MenuActivity;
 
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import java.io.IOException;
 
 public class HomeActivity extends Activity {
 
     TextView txtString;
-
-    public String url= "https://reqres.in/api/users/2";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.homepage);
         txtString = (TextView)findViewById(R.id.welcomeMsg);
 
-        try {
-            run();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        View testMeButton = findViewById(R.id.testme);
+        testMeButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Intent switchActivityIntent = new Intent(HomeActivity.this, MenuActivity.class);
+                startActivity(switchActivityIntent);
+            }
+        });
     }
 
-    void run() throws IOException {
-
+//    void run() throws IOException {
+//
 //        OkHttpClient client = new NetworkModule().provideOkHttpClient();
 //
 //        Request request = new Request.Builder()
@@ -58,5 +58,5 @@ public class HomeActivity extends Activity {
 //
 //            }
 //        });
-    }
+//    }
 }

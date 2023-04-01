@@ -1,0 +1,26 @@
+#!/usr/bin/env sh
+# License: Apache 2.0
+# Source: https://github.com/handstandsam/saydle/
+# Version: 1.0.0-alpha03
+
+# Customizations
+success_phrase="Build Success"
+failed_phrase="Build Failed"
+voice="Samantha"
+
+# Saydle Script
+pullargs () {
+    for i do printf %s "$i " ; done
+}
+orig_gradew_args=$(pullargs "$@") # Will store all the arguments sent to ./saydlew
+
+gradlew_cmd="./gradlew $orig_gradew_args"              # Gradlew Command
+success_cmd="say -v $voice \"$success_phrase\""        # On Success
+failed_cmd="say -v $voice \"$failed_phrase\""          # On Failure
+full_cmd="$gradlew_cmd && $success_cmd || $failed_cmd" # Command to Execute
+
+echo "Executing: $gradlew_cmd"
+echo "Saydle will say 🔊 \"$success_phrase\" ✅ or \"$failed_phrase\" ❌ on completion."
+
+# Execute
+eval $full_cmd

@@ -1,3 +1,5 @@
+import utils.spoon.SpoonReportsMerger
+
 buildscript {
     repositories {
         google()
@@ -6,11 +8,15 @@ buildscript {
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
         maven { url 'https://oss.jfrog.org/artifactory/oss-snapshot-local/' }
         maven { url 'https://plugins.gradle.org/m2/' }
+        maven { url 'https://artifactory.phonepe.com/content/groups/public/' }
+        maven { url 'https://artifactory.phonepe.com/content/repositories/snapshots/' }
+        mavenLocal()
     }
 
     dependencies {
-        classpath 'com.jaredsburrows:gradle-spoon-plugin:1.5.1'
-        classpath 'org.jacoco:org.jacoco.core:0.8.5'
+        classpath 'com.jaredsburrows:gradle-spoon-plugin:1.5.11-SNAPSHOT'
+        classpath 'com.phonepe:app-core:1.0-SNAPSHOT'
+//        classpath 'org.jacoco:org.jacoco.core:0.8.8'
     }
 
 }
@@ -20,50 +26,67 @@ apply plugin: 'com.jaredsburrows.spoon'
 apply plugin: 'jacoco'
 
 jacoco {
-    toolVersion = '0.8.5'
+    toolVersion = '0.8.8'
 }
 
 repositories {
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    mavenLocal()
 }
 
 
 dependencies {
+    implementation project(':reusable-activities')
     implementation 'com.squareup.okhttp3:okhttp:4.9.3'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.9.3'
-    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'org.apache.httpcomponents:httpclient-android:4.3.5+'
+    implementation 'commons-io:commons-io:2.11.0'
 
-    androidTestImplementation 'androidx.test:runner:1.1.2-alpha01'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
-    androidTestImplementation 'androidx.test:rules:1.1.2-alpha01'
-    androidTestImplementation 'com.squareup.spoon:spoon-client:2.0.0-SNAPSHOT'
+    androidTestImplementation 'androidx.test:runner:1.5.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
+    androidTestImplementation 'androidx.test:core:1.5.0'
+    androidTestImplementation 'androidx.test:rules:1.5.0'
+    androidTestImplementation 'com.squareup.spoon:spoon-client:2.0.8-SNAPSHOT'
+    androidTestImplementation 'com.squareup.spoon:spoon-internal-axmlparser:2.0.8-SNAPSHOT'
     androidTestImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
+    androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.3.0-alpha01'
     androidTestImplementation 'net.lightbody.bmp:browsermob-core:2.1.5'
+    androidTestImplementation "io.qameta.allure:allure-kotlin-model:2.2.6"
+    androidTestImplementation "io.qameta.allure:allure-kotlin-commons:2.2.6"
+    androidTestImplementation "io.qameta.allure:allure-kotlin-junit4:2.2.6"
+    androidTestImplementation "io.qameta.allure:allure-kotlin-android:2.2.6"
+    androidTestImplementation "androidx.fragment:fragment-testing:1.5.4"
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.robolectric:robolectric:4.8.1'
-    testImplementation 'androidx.test:core:1.4.1-alpha06'
-    testImplementation "androidx.test:runner:1.1.1"
-    testImplementation 'androidx.test.ext:junit:1.1.0'
-    testImplementation 'androidx.test.ext:truth:1.1.0'
-    testImplementation 'androidx.test.espresso:espresso-core:3.5.0-alpha01'
-    testImplementation 'androidx.test.espresso:espresso-intents:3.1.1'
+    testImplementation 'androidx.test:core:1.5.0'
+    testImplementation 'androidx.test:runner:1.5.1'
+    testImplementation 'androidx.test.ext:junit:1.1.4'
+    testImplementation 'androidx.test.ext:truth:1.5.0'
+    testImplementation 'androidx.test.espresso:espresso-core:3.5.0'
+    testImplementation 'androidx.test.espresso:espresso-intents:3.5.0'
+
+    androidTestImplementation "androidx.test.services:test-services:1.4.2"
+    androidTestImplementation "androidx.test.services:storage:1.4.2"
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.1'
+    testImplementation "org.junit.platform:junit-platform-reporting:1.9.1"
 }
 android {
-    compileSdkVersion 30
+    compileSdkVersion 33
     buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "com.emmasuzuki.espressospoon"
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "io.qameta.allure.android.runners.AllureAndroidJUnitRunner"
+        testInstrumentationRunnerArguments useTestStorageService: 'true'
     }
 
     buildTypes {
@@ -76,60 +99,226 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
     packagingOptions {
-        exclude 'LICENSE.txt'
+        resources {
+            excludes += ['LICENSE.txt']
+        }
     }
+
 
     testOptions {
         unitTests {
             includeAndroidResources = true
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    namespace 'com.emmasuzuki.espressospoondemo'
+    testNamespace 'com.emmasuzuki.espressospoon'
 }
 
 spoon {
+    File spoonOutput = file("$buildDir/spoon-output")
+
+    if(spoonOutput.exists()) {
+        println("Deleting spoon-output directory")
+        spoonOutput.delete()
+    }
+
+    File allureOutput = file("$buildDir/allure-output")
+
+    if(allureOutput.exists()) {
+        println("Deleting allure-output directory")
+        allureOutput.delete()
+    }
+
     debug = true
+    allureRunner = true
+
+    if (project.hasProperty("PhonepeExecution")) {
+        if (project.PhonepeExecution == "true") {
+            phonepeExecution = true
+        } else {
+            phonepeExecution = false
+        }
+    }
+
+    if (project.hasProperty("ClassLevelExecution")) {
+        if (project.ClassLevelExecution == "true") {
+            classLevelExecution = true
+        } else {
+            classLevelExecution = false
+        }
+    }
+
+    deviceAvailabilityTimeout = 2
+    devicePing = 10
+
+    recordVideo = true
+    trackLogcat = false
+
     baseOutputDir = file("$buildDir/custom-report-dir")
-    adbTimeout = 30
-    grantAllPermissions = true
-    shard = true
-    codeCoverage = true
+    baseAllureDir = file("$buildDir/custom-allure-dir")
+
+
+
+    if (project.hasProperty("spoonClassName")) {
+        className = project.spoonClassName
+
+        if (project.hasProperty("spoonMethodName")) {
+            methodName = project.spoonMethodName
+        }
+    }
+
+    ignoreFailures = true
 
     if (project.hasProperty("TestGroup")) {
         if (project.TestGroup == "Sanity") {
             instrumentationArgs = ["notAnnotation=com.emmasuzuki.espressospoondemo.utils.annotations.Failure"]
         } else {
-            instrumentationArgs = ["annotation=com.emmasuzuki.espressospoondemo.utils.annotations." + project.TestGroup]
+            if (project.hasProperty("RealDevice")) {
+                if (project.RealDevice == "true") {
+                    instrumentationArgs = ["annotation=com.emmasuzuki.espressospoondemo.utils.annotations." + project.TestGroup +
+                                                   "," + "com.emmasuzuki.espressospoondemo.utils.annotations." + "RealDevice",
+                                       "listener=com.emmasuzuki.espressospoondemo.utils.AnnotationsTestPrinter"]
+                } else {
+                    instrumentationArgs = ["annotation=com.emmasuzuki.espressospoondemo.utils.annotations." + project.TestGroup,
+                                           "notAnnotation=com.emmasuzuki.espressospoondemo.utils.annotations." + "RealDevice",
+                                           "listener=com.emmasuzuki.espressospoondemo.utils.AnnotationsTestPrinter"]
+                }
+            } else {
+                instrumentationArgs = ["annotation=com.emmasuzuki.espressospoondemo.utils.annotations." + project.TestGroup,
+                                       "listener=com.emmasuzuki.espressospoondemo.utils.AnnotationsTestPrinter"]
+            }
         }
     }
 
-    if (project.hasProperty("Devices")) {
-        devices = project.Devices.split(",")
+    if (project.hasProperty("instrumentParams")) {
+        String [] eachParamArray = project.instrumentParams.split(",")
+        for(String eachParam : eachParamArray) {
+            instrumentationArgs.add(eachParam)
+        }
     }
 
+    shard = true
+    adbTimeout = 60 * 3
+    codeCoverage = false
+    grantAllPermissions = true
 
+    if (project.hasProperty(('Devices'))) devices = project.Devices.split(",")
+
+    retryTimes = 1
+
+    deviceEligibilityChecker = true
+
+    deviceEligibilityAnnotation = "com.emmasuzuki.espressospoondemo.utils.annotations.DeviceEligibilityTest"
+    deviceEligibilityLoopCount = 2
+
+    if (project.hasProperty("PreBuiltApp")) {
+        if (project.PreBuiltApp == "true") {
+            preBuiltApp = true
+        } else {
+            preBuiltApp = false
+        }
+    }
+
+    if (project.hasProperty("InstrumentationApp")) {
+        instrumentationApp = project.InstrumentationApp
+    }
+
+    if (project.hasProperty("TargetApp")) {
+        targetApp = project.TargetApp
+    }
 }
+
+
+abstract class MergeSpoonReport extends DefaultTask {
+    @TaskAction
+    def greet() {
+        SpoonReportsMerger merger = new SpoonReportsMerger(new File("/Users/vinodh.raj/Reports/Spoon/74/developersProductionAutomationtest"),
+                new File("/Users/vinodh.raj/Reports/Spoon/75/developersProductionAutomationtest"),
+                new File("/Users/vinodh.raj/Reports/Spoon/Merged"));
+
+        merger.mergeDeviceDirectory()
+                .mergeImageDirectory()
+                .mergeJUnitReportsDirectory()
+                .mergeTestDirectory()
+                .mergeVideoDirectory()
+                .copyStaticDirectoryToDestination()
+                .mergeIndexHTML();
+    }
+}
+
+tasks.register('mergeSpoonReports', MergeSpoonReport)
 
 tasks.withType(Test) {
     jacoco.includeNoLocationClasses = true
+    jacoco.excludes = ['jdk.internal.*']
 }
 
-task jacocoTestReport(type: JacocoReport, dependsOn: ['spoonDebugAndroidTest']) {
+project.afterEvaluate {
+//    tasks.create(name: "debugCoverage", type: JacocoReport, dependsOn: "spoonDebugAndroidTest") {
+    tasks.create(name: "debugCoverage", type: JacocoReport) {
+        group = "Reporting"
+        description = "Generate Jacoco coverage reports for the debug build."
 
-    reports {
-        xml.enabled = true
-        html.enabled = true
+        reports {
+            xml.enabled = true
+            html.enabled = true
+        }
+
+        def javaClasses = []
+        def javaSrc = []
+        def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*', 'android/**/*.*']
+        rootProject.subprojects.each { proj ->
+            project.logger.info('project names')
+            project.logger.info(proj.name)
+            javaClasses << fileTree(dir: "$proj.buildDir/intermediates/javac/debug", excludes: fileFilter)
+
+            javaSrc << "$proj.projectDir/src/main/java"
+        }
+
+        print javaClasses
+        print javaSrc
+
+        sourceDirectories.setFrom(files([javaSrc]))
+        classDirectories.setFrom(files([javaClasses]))
+        executionData.setFrom(fileTree(dir: "$buildDir", includes: [
+                "custom-report-dir/debug/coverage/merged-coverage.ec"
+        ]))
+
+//        def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*', 'android/**/*.*']
+//        def debugTree = fileTree(dir: "${buildDir}/intermediates/javac/debug", excludes: fileFilter)
+//        def moduleDebugTree = fileTree(dir: "/Users/vinodh.raj/Workspace/EspressoSpoonDemo/reusable-activities/build/intermediates/javac/debug", excludes: fileFilter)
+//        def mainSrc = "${project.projectDir}/src/main/java"
+//        def moduleMainSrc = "/Users/vinodh.raj/Workspace/EspressoSpoonDemo/reusable-activities/src/main/java"
+//
+//        sourceDirectories.setFrom(files([mainSrc, moduleMainSrc]))
+//        classDirectories.setFrom(files([debugTree, moduleDebugTree]))
+//        executionData.setFrom(fileTree(dir: "$buildDir", includes: [
+//                "custom-report-dir/debug/coverage/merged-coverage.ec"
+//        ]))
+
     }
-
-    def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*', 'android/**/*.*']
-    def debugTree = fileTree(dir: "${buildDir}/intermediates/javac/debug", excludes: fileFilter)
-    def mainSrc = "${project.projectDir}/src/main/java"
-
-    sourceDirectories.setFrom(files([mainSrc]))
-    classDirectories.setFrom(files([debugTree]))
-    executionData.setFrom(fileTree(dir: "$buildDir", includes: [
-            "custom-report-dir/debug/coverage/merged-coverage.ec"
-    ]))
 }
+
+//task jacocoTestReport(type: JacocoReport, dependsOn: ['spoonDebugAndroidTest']) {
+//
+//    reports {
+//        xml.enabled = true
+//        html.enabled = true
+//    }
+//
+//    def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*', 'android/**/*.*']
+//    def debugTree = fileTree(dir: "${buildDir}/intermediates/javac/debug", excludes: fileFilter)
+//    def mainSrc = "${project.projectDir}/src/main/java"
+//
+//    sourceDirectories.setFrom(files([mainSrc, moduleSrc]))
+//    classDirectories.setFrom(files([debugTree]))
+//    executionData.setFrom(fileTree(dir: "$buildDir", includes: [
+//            "custom-report-dir/debug/coverage/merged-coverage.ec"
+//    ]))
+//}
 

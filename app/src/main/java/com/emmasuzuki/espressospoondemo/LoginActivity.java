@@ -34,6 +34,7 @@ public class LoginActivity extends Activity {
 
     private static final String DEMO_EMAIL = "phonepe@test.com";
     private static final String DEMO_PASSWORD = "phonepe";
+    private static final boolean loggedIn = true;
 
     private EditText mEmail, mPassword;
     private View mError;
@@ -41,23 +42,28 @@ public class LoginActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.login);
+//        if (loggedIn) {
+//            Intent switchActivityIntent = new Intent(this, HomeActivity.class);
+//            startActivity(switchActivityIntent);
+//        } else {
+            setContentView(R.layout.login);
 
-        mEmail = (EditText) findViewById(R.id.email);
-        mPassword = (EditText) findViewById(R.id.password);
+            mEmail = (EditText) findViewById(R.id.email);
+            mPassword = (EditText) findViewById(R.id.password);
 
-        View submitButton = findViewById(R.id.submit);
-        submitButton.setOnClickListener(new View.OnClickListener() {
+            View submitButton = findViewById(R.id.submit);
+            submitButton.setOnClickListener(new View.OnClickListener() {
 
-            @Override
-            public void onClick(View v) {
-                validateFields();
+                @Override
+                public void onClick(View v) {
+                    validateFields();
 
-                if (mEmail.getError() == null && mPassword.getError() == null) {
-                    validateAccount();
+                    if (mEmail.getError() == null && mPassword.getError() == null) {
+                        validateAccount();
+                    }
                 }
-            }
-        });
+            });
+//        }
     }
 
     private void validateFields() {
@@ -76,9 +82,7 @@ public class LoginActivity extends Activity {
 
     private void validateAccount() {
         if (!mEmail.getText().toString().equals(DEMO_EMAIL) || !mPassword.getText().toString().equals(DEMO_PASSWORD)) {
-            if (mError == null) {
-                mError = findViewById(R.id.error);
-            }
+            mError = findViewById(R.id.error);
 
             // comment this line out to demonstrate test failure
             mError.setVisibility(View.VISIBLE);

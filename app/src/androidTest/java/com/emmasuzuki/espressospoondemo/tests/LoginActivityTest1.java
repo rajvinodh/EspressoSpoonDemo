@@ -1,11 +1,16 @@
 package com.emmasuzuki.espressospoondemo.tests;
 
-import org.junit.Test;;
 import com.emmasuzuki.espressospoondemo.R;
+import com.emmasuzuki.espressospoondemo.pages.HomePage;
 import com.emmasuzuki.espressospoondemo.pages.LoginPage;
-import com.emmasuzuki.espressospoondemo.utils.annotations.DeviceEligibilityTest;
+import com.emmasuzuki.espressospoondemo.utils.annotations.Device;
+import com.emmasuzuki.espressospoondemo.utils.annotations.Failure;
 import com.emmasuzuki.espressospoondemo.utils.annotations.RealDevice;
+import com.emmasuzuki.espressospoondemo.utils.annotations.RetryRule;
 import com.emmasuzuki.espressospoondemo.utils.annotations.Workshop;
+
+import org.junit.Test;
+
 import java.io.IOException;
 
 import static androidx.test.espresso.Espresso.onView;
@@ -17,20 +22,13 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
 
-public class LoginActivityTest extends BaseTest {
+public class LoginActivityTest1 extends BaseTest {
 
     LoginPage loginPage;
-
-    @DeviceEligibilityTest
-    @Workshop
-    @Test
-    public void eligibility () {
-//        if(getDeviceSerialID().equals("CTLID18111600932")) {
-//            throw new RuntimeException("Custom Exception");
-//        }
-    }
+    HomePage homePage;
 
     @RealDevice
+    @Failure
     @Workshop
     @Test
     public void test_Invalid_Email_Error() throws IOException, InterruptedException {
@@ -41,27 +39,24 @@ public class LoginActivityTest extends BaseTest {
                 .check(matches(hasErrorText("Please enter your email")));
     }
 
-//    @Workshop
     @Test
     public void test_Empty_Password_Error() {
         loginPage = new LoginPage();
         loginPage.login("test@test.com", "")
                 .getPasswordField()
-                    .check(matches(hasErrorText("Please enter your password")));
+                .check(matches(hasErrorText("Please enter your password")));
     }
 
-//    @Workshop
     @Test
     public void test_Set_Email_Mismatch_Error() {
         loginPage = new LoginPage();
         loginPage.login("espresso@spoon.com", "phonepe")
                 .getErrorMsg()
-                    .check(matches(allOf(isDisplayed()
-                            , withText("Your email or password is wrong"))));
+                .check(matches(allOf(isDisplayed()
+                        , withText("Your email or password is wrong"))));
 
     }
 
-//    @Workshop
     @Test
     public void test_Set_Password_Mismatch_Error() {
         loginPage = new LoginPage();
@@ -72,7 +67,8 @@ public class LoginActivityTest extends BaseTest {
 
     }
 
-//    @Workshop
+    @Device({"CTLID18111600932"})
+    @Workshop
     @Test
     public void test_Set_Correct_Cred() throws InterruptedException {
         loginPage = new LoginPage();
@@ -83,16 +79,5 @@ public class LoginActivityTest extends BaseTest {
 
 
         onView(withId(R.id.testme)).perform(click());
-    }
-
-    @RealDevice
-    @Workshop
-    @Test
-    public void test_Set_Correct_Cred_failure() {
-        loginPage = new LoginPage();
-        loginPage.successfulLogin("phonepe@test.com", "phonepe1")
-                .getWelcomeMsg()
-                .check(matches(allOf(isDisplayed()
-                        , withText("Welcome! Everyone!"))));
     }
 }

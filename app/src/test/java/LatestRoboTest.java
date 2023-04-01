@@ -3,6 +3,11 @@ import android.content.Intent;
 import android.os.Build;
 
 import org.junit.Test;
+import org.junit.platform.launcher.Launcher;
+import org.junit.platform.launcher.LauncherDiscoveryRequest;
+import org.junit.platform.launcher.TestPlan;
+import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
+import org.junit.platform.launcher.core.LauncherFactory;
 import org.junit.runner.RunWith;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
@@ -27,6 +32,10 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static junit.framework.TestCase.assertEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
+import static org.junit.platform.engine.discovery.DiscoverySelectors.selectDirectory;
+import static org.junit.platform.engine.discovery.DiscoverySelectors.selectPackage;
+
+import java.io.IOException;
 
 @RunWith(AndroidJUnit4.class)
 @Config(sdk = {Build.VERSION_CODES.O_MR1})
@@ -41,5 +50,19 @@ public class LatestRoboTest {
         onView(withId(R.id.email)).perform(typeText("phonepe@test.com"));
         onView(withId(R.id.password)).perform(typeText("phonepe"));
         onView(withId(R.id.submit)).perform(click());
+    }
+
+    @Test
+    public void test_Invalid_Email_Error() throws IOException, InterruptedException {
+        LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
+                .selectors(
+                        selectDirectory("/Users/vinodh.raj/Workspace/EspressoSpoonDemo/app/src/androidTest/java/com/emmasuzuki/espressospoondemo/tests")
+                )
+                .build();
+
+        Launcher launcher = LauncherFactory.create();
+
+        TestPlan testPlan = launcher.discover(request);
+
     }
 }

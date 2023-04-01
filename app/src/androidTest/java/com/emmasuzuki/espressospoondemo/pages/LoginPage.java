@@ -23,6 +23,17 @@ public class LoginPage extends BasePage {
         return this;
     }
 
+    public HomePage login2(String email, String password) {
+        getEmailField().perform(typeText(email));
+        getPasswordField().perform(typeText(password));
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return new HomePage();
+    }
+
     public ViewInteraction getEmailField() {
         return onView(withId(R.id.email));
     }

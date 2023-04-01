@@ -7,6 +7,7 @@
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="submit">Submit</string>
+    <string name="testme">Test Me</string>
 
     <string name="msg_email_error">Please enter your email</string>
     <string name="msg_password_error">Please enter your password</string>
