@@ -20,14 +20,14 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
 
-@Device({"CTLID18111600932"})
+//@Device({"CTLID18111600932"})
 public class LoginActivityTest3 extends BaseTest {
 
     LoginPage loginPage;
     HomePage homePage;
 
-    @Device({"CTLID18111600932"})
-    @Workshop
+//    @Device({"CTLID18111600932"})
+//    @Workshop
     @Test
     public void test_Invalid_Email_Error() throws IOException, InterruptedException {
 
@@ -68,7 +68,7 @@ public class LoginActivityTest3 extends BaseTest {
 
 
     @RealDevice
-    @Workshop
+//    @Workshop
     @Test
     public void test_Set_Correct_Cred() throws InterruptedException {
         loginPage = new LoginPage();

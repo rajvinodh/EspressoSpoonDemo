@@ -20,7 +20,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
 
-@Device({"CTLID18111600932"})
+//@Device({"CTLID18111600932"})
 public class LoginActivityTest2 extends BaseTest {
 
     LoginPage loginPage;
@@ -69,7 +69,7 @@ public class LoginActivityTest2 extends BaseTest {
 
 
     @RealDevice
-    @Workshop
+//    @Workshop
     @Test
     public void test_Set_Correct_Cred() throws InterruptedException {
         loginPage = new LoginPage();

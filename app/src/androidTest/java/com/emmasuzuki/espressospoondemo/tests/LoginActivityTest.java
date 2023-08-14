@@ -24,10 +24,16 @@ public class LoginActivityTest extends BaseTest {
     @DeviceEligibilityTest
     @Workshop
     @Test
-    public void eligibility () {
-//        if(getDeviceSerialID().equals("CTLID18111600932")) {
+    public void eligibility () throws InterruptedException {
+//        if(getDeviceSerialID().equals("a67525ae")) {
 //            throw new RuntimeException("Custom Exception");
 //        }
+
+//        Thread.sleep(5000);
+//        loginPage = new LoginPage();
+//        loginPage.login("phonepe", "phonepe")
+//                .getEmailField()
+//                .check(matches(hasErrorText("Please enter your email")));
     }
 
     @RealDevice
@@ -41,7 +47,7 @@ public class LoginActivityTest extends BaseTest {
                 .check(matches(hasErrorText("Please enter your email")));
     }
 
-//    @Workshop
+    @Workshop
     @Test
     public void test_Empty_Password_Error() {
         loginPage = new LoginPage();
@@ -50,7 +56,7 @@ public class LoginActivityTest extends BaseTest {
                     .check(matches(hasErrorText("Please enter your password")));
     }
 
-//    @Workshop
+    @Workshop
     @Test
     public void test_Set_Email_Mismatch_Error() {
         loginPage = new LoginPage();
@@ -61,7 +67,7 @@ public class LoginActivityTest extends BaseTest {
 
     }
 
-//    @Workshop
+    @Workshop
     @Test
     public void test_Set_Password_Mismatch_Error() {
         loginPage = new LoginPage();
@@ -72,7 +78,7 @@ public class LoginActivityTest extends BaseTest {
 
     }
 
-//    @Workshop
+    @Workshop
     @Test
     public void test_Set_Correct_Cred() throws InterruptedException {
         loginPage = new LoginPage();
@@ -83,12 +89,13 @@ public class LoginActivityTest extends BaseTest {
 
 
         onView(withId(R.id.testme)).perform(click());
+
     }
 
     @RealDevice
     @Workshop
     @Test
-    public void test_Set_Correct_Cred_failure() {
+    public void test_Set_Correct_Cred_failure() throws InterruptedException {
         loginPage = new LoginPage();
         loginPage.successfulLogin("phonepe@test.com", "phonepe1")
                 .getWelcomeMsg()

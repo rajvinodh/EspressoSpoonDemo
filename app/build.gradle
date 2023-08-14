@@ -1,5 +1,3 @@
-import utils.spoon.SpoonReportsMerger
-
 buildscript {
     repositories {
         google()
@@ -8,14 +6,18 @@ buildscript {
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
         maven { url 'https://oss.jfrog.org/artifactory/oss-snapshot-local/' }
         maven { url 'https://plugins.gradle.org/m2/' }
-        maven { url 'https://artifactory.phonepe.com/content/groups/public/' }
-        maven { url 'https://artifactory.phonepe.com/content/repositories/snapshots/' }
+        maven {
+            url 'https://artifactory.phonepe.com/repository/snapshots/'
+        }
+        maven {
+            url 'https://artifactory.phonepe.com/repository/releases/'
+        }
         mavenLocal()
     }
 
     dependencies {
-        classpath 'com.jaredsburrows:gradle-spoon-plugin:1.5.11-SNAPSHOT'
-        classpath 'com.phonepe:app-core:1.0-SNAPSHOT'
+        classpath 'com.jaredsburrows:gradle-spoon-plugin:2.3-SNAPSHOT'
+//        classpath 'com.phonepe:app-core:1.0-SNAPSHOT'
 //        classpath 'org.jacoco:org.jacoco.core:0.8.8'
     }
 
@@ -47,8 +49,8 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
     androidTestImplementation 'androidx.test:core:1.5.0'
     androidTestImplementation 'androidx.test:rules:1.5.0'
-    androidTestImplementation 'com.squareup.spoon:spoon-client:2.0.8-SNAPSHOT'
-    androidTestImplementation 'com.squareup.spoon:spoon-internal-axmlparser:2.0.8-SNAPSHOT'
+    androidTestImplementation 'com.squareup.spoon:spoon-client:3.3-SNAPSHOT'
+    androidTestImplementation 'com.squareup.spoon:spoon-internal-axmlparser:3.3-SNAPSHOT'
     androidTestImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.3.0-alpha01'
     androidTestImplementation 'net.lightbody.bmp:browsermob-core:2.1.5'
@@ -122,14 +124,14 @@ android {
 spoon {
     File spoonOutput = file("$buildDir/spoon-output")
 
-    if(spoonOutput.exists()) {
+    if (spoonOutput.exists()) {
         println("Deleting spoon-output directory")
         spoonOutput.delete()
     }
 
     File allureOutput = file("$buildDir/allure-output")
 
-    if(allureOutput.exists()) {
+    if (allureOutput.exists()) {
         println("Deleting allure-output directory")
         allureOutput.delete()
     }
@@ -138,6 +140,7 @@ spoon {
     allureRunner = true
 
     if (project.hasProperty("PhonepeExecution")) {
+        println(String.format("PhonepeExecution is passed: %s", project.PhonepeExecution))
         if (project.PhonepeExecution == "true") {
             phonepeExecution = true
         } else {
@@ -145,7 +148,9 @@ spoon {
         }
     }
 
+
     if (project.hasProperty("ClassLevelExecution")) {
+        println(String.format("ClassLevelExecution is passed: %s", project.ClassLevelExecution))
         if (project.ClassLevelExecution == "true") {
             classLevelExecution = true
         } else {
@@ -153,15 +158,12 @@ spoon {
         }
     }
 
-    deviceAvailabilityTimeout = 2
-    devicePing = 10
 
-    recordVideo = true
-    trackLogcat = false
+    deviceAvailabilityTimeout = 10
+    devicePing = 10
 
     baseOutputDir = file("$buildDir/custom-report-dir")
     baseAllureDir = file("$buildDir/custom-allure-dir")
-
 
 
     if (project.hasProperty("spoonClassName")) {
@@ -174,15 +176,21 @@ spoon {
 
     ignoreFailures = true
 
+
     if (project.hasProperty("TestGroup")) {
-        if (project.TestGroup == "Sanity") {
-            instrumentationArgs = ["notAnnotation=com.emmasuzuki.espressospoondemo.utils.annotations.Failure"]
-        } else {
+
+        String annotationFilePath = String.format(
+                "$rootDir/app/src/androidTest/java/com/emmasuzuki/espressospoondemo/utils/annotations/%s.java",
+                project.TestGroup)
+        File testGroup = file(annotationFilePath)
+
+        if (testGroup.exists()) {
+
             if (project.hasProperty("RealDevice")) {
                 if (project.RealDevice == "true") {
                     instrumentationArgs = ["annotation=com.emmasuzuki.espressospoondemo.utils.annotations." + project.TestGroup +
                                                    "," + "com.emmasuzuki.espressospoondemo.utils.annotations." + "RealDevice",
-                                       "listener=com.emmasuzuki.espressospoondemo.utils.AnnotationsTestPrinter"]
+                                           "listener=com.emmasuzuki.espressospoondemo.utils.AnnotationsTestPrinter"]
                 } else {
                     instrumentationArgs = ["annotation=com.emmasuzuki.espressospoondemo.utils.annotations." + project.TestGroup,
                                            "notAnnotation=com.emmasuzuki.espressospoondemo.utils.annotations." + "RealDevice",
@@ -192,37 +200,47 @@ spoon {
                 instrumentationArgs = ["annotation=com.emmasuzuki.espressospoondemo.utils.annotations." + project.TestGroup,
                                        "listener=com.emmasuzuki.espressospoondemo.utils.AnnotationsTestPrinter"]
             }
+
+            title = project.TestGroup
+        } else {
+            throw new InvalidUserDataException(String.format("%s is invlaid testgroup, %s annotation itself is not present", project.TestGroup, annotationFilePath))
         }
     }
 
-    if (project.hasProperty("instrumentParams")) {
-        String [] eachParamArray = project.instrumentParams.split(",")
-        for(String eachParam : eachParamArray) {
+    if (project.hasProperty("InstrumentParams")) {
+        println(String.format("InstrumentParams is passed: %s", project.InstrumentParams))
+        String[] eachParamArray = project.InstrumentParams.split(",")
+        for (String eachParam : eachParamArray) {
+            println(String.format("Instrumentation Args set: %s", eachParam))
             instrumentationArgs.add(eachParam)
         }
     }
 
+
     shard = true
-    adbTimeout = 60 * 3
     codeCoverage = false
     grantAllPermissions = true
 
     if (project.hasProperty(('Devices'))) devices = project.Devices.split(",")
 
+    if (project.hasProperty(('AdbTimeout'))) adbTimeout = Integer.parseInt(project.AdbTimeout)
+
+    if (project.hasProperty(('FileTransferTimeout'))) fileTransferTimeout = Integer.parseInt(project.FileTransferTimeout)
+
     retryTimes = 1
-
     deviceEligibilityChecker = true
-
     deviceEligibilityAnnotation = "com.emmasuzuki.espressospoondemo.utils.annotations.DeviceEligibilityTest"
-    deviceEligibilityLoopCount = 2
+    deviceEligibilityLoopCount = 1
 
     if (project.hasProperty("PreBuiltApp")) {
+        println(String.format("PreBuiltApp is passed: %s", project.PreBuiltApp))
         if (project.PreBuiltApp == "true") {
             preBuiltApp = true
         } else {
             preBuiltApp = false
         }
     }
+
 
     if (project.hasProperty("InstrumentationApp")) {
         instrumentationApp = project.InstrumentationApp
@@ -231,27 +249,27 @@ spoon {
     if (project.hasProperty("TargetApp")) {
         targetApp = project.TargetApp
     }
-}
 
-
-abstract class MergeSpoonReport extends DefaultTask {
-    @TaskAction
-    def greet() {
-        SpoonReportsMerger merger = new SpoonReportsMerger(new File("/Users/vinodh.raj/Reports/Spoon/74/developersProductionAutomationtest"),
-                new File("/Users/vinodh.raj/Reports/Spoon/75/developersProductionAutomationtest"),
-                new File("/Users/vinodh.raj/Reports/Spoon/Merged"));
-
-        merger.mergeDeviceDirectory()
-                .mergeImageDirectory()
-                .mergeJUnitReportsDirectory()
-                .mergeTestDirectory()
-                .mergeVideoDirectory()
-                .copyStaticDirectoryToDestination()
-                .mergeIndexHTML();
+    if (project.hasProperty("RecordVideo")) {
+        println(String.format("RecordVideo is passed: %s", project.RecordVideo))
+        if (project.RecordVideo == "true") {
+            recordVideo = true
+        } else {
+            recordVideo = false
+        }
     }
-}
 
-tasks.register('mergeSpoonReports', MergeSpoonReport)
+    if (project.hasProperty("TrackLogcat")) {
+        println(String.format("TrackLogcat is passed: %s", project.TrackLogcat))
+        if (project.TrackLogcat == "true") {
+            trackLogcat = true
+        } else {
+            trackLogcat = false
+        }
+    }
+
+    noAnimations = true
+}
 
 tasks.withType(Test) {
     jacoco.includeNoLocationClasses = true

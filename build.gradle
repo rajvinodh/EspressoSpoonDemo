@@ -17,6 +17,12 @@ buildscript {
 
 allprojects {
     repositories {
+        maven {
+            url 'https://artifactory.phonepe.com/repository/snapshots/'
+        }
+        maven {
+            url 'https://artifactory.phonepe.com/repository/releases/'
+        }
         google()
         mavenCentral()
         jcenter()

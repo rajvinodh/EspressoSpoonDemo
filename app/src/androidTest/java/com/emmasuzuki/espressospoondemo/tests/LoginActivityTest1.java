@@ -37,6 +37,7 @@ public class LoginActivityTest1 extends BaseTest {
         loginPage.login("phonepe", "phonepe")
                 .getEmailField()
                 .check(matches(hasErrorText("Please enter your email")));
+        throw new RuntimeException("Custom failure");
     }
 
     @Test
@@ -67,7 +68,7 @@ public class LoginActivityTest1 extends BaseTest {
 
     }
 
-    @Device({"CTLID18111600932"})
+//    @Device({"CTLID18111600932"})
     @Workshop
     @Test
     public void test_Set_Correct_Cred() throws InterruptedException {
