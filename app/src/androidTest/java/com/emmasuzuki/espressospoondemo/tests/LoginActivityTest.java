@@ -1,8 +1,10 @@
 package com.emmasuzuki.espressospoondemo.tests;
 
+import org.junit.Assume;
 import org.junit.Test;;
 import com.emmasuzuki.espressospoondemo.R;
 import com.emmasuzuki.espressospoondemo.pages.LoginPage;
+import com.emmasuzuki.espressospoondemo.utils.annotations.CommonCategory;
 import com.emmasuzuki.espressospoondemo.utils.annotations.DeviceEligibilityTest;
 import com.emmasuzuki.espressospoondemo.utils.annotations.RealDevice;
 import com.emmasuzuki.espressospoondemo.utils.annotations.Workshop;
@@ -25,7 +27,7 @@ public class LoginActivityTest extends BaseTest {
     @Workshop
     @Test
     public void eligibility () throws InterruptedException {
-//        if(getDeviceSerialID().equals("a67525ae")) {
+//        if(getDeviceSerialID().equals("RZCW20RMPXM")) {
 //            throw new RuntimeException("Custom Exception");
 //        }
 
@@ -34,6 +36,13 @@ public class LoginActivityTest extends BaseTest {
 //        loginPage.login("phonepe", "phonepe")
 //                .getEmailField()
 //                .check(matches(hasErrorText("Please enter your email")));
+    }
+
+    @CommonCategory
+    @DeviceEligibilityTest
+    @Test
+    public void customEligibility () throws InterruptedException {
+
     }
 
     @RealDevice
@@ -45,6 +54,7 @@ public class LoginActivityTest extends BaseTest {
         loginPage.login("phonepe", "phonepe")
                 .getEmailField()
                 .check(matches(hasErrorText("Please enter your email")));
+
     }
 
     @Workshop

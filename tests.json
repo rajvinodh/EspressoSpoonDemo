@@ -1,0 +1,6 @@
+{
+  "tests": [
+    "com.emmasuzuki.espressospoondemo.tests.LoginActivityTest1#test_Set_Correct_Cred",
+    "com.emmasuzuki.espressospoondemo.tests.LoginActivityTest1#test_Invalid_Email_Err"
+  ]
+}

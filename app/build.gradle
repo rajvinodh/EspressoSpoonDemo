@@ -16,7 +16,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.jaredsburrows:gradle-spoon-plugin:2.3-SNAPSHOT'
+        classpath 'com.jaredsburrows:gradle-spoon-plugin:2.6-SNAPSHOT'
 //        classpath 'com.phonepe:app-core:1.0-SNAPSHOT'
 //        classpath 'org.jacoco:org.jacoco.core:0.8.8'
     }
@@ -49,8 +49,8 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
     androidTestImplementation 'androidx.test:core:1.5.0'
     androidTestImplementation 'androidx.test:rules:1.5.0'
-    androidTestImplementation 'com.squareup.spoon:spoon-client:3.3-SNAPSHOT'
-    androidTestImplementation 'com.squareup.spoon:spoon-internal-axmlparser:3.3-SNAPSHOT'
+    androidTestImplementation 'com.squareup.spoon:spoon-client:3.6-SNAPSHOT'
+    androidTestImplementation 'com.squareup.spoon:spoon-internal-axmlparser:3.6-SNAPSHOT'
     androidTestImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.3.0-alpha01'
     androidTestImplementation 'net.lightbody.bmp:browsermob-core:2.1.5'
@@ -159,7 +159,7 @@ spoon {
     }
 
 
-    deviceAvailabilityTimeout = 10
+    deviceAvailabilityTimeout = 2
     devicePing = 10
 
     baseOutputDir = file("$buildDir/custom-report-dir")
@@ -176,6 +176,9 @@ spoon {
 
     ignoreFailures = true
 
+    if (project.hasProperty("TestGroup") && project.hasProperty("ExecutionType") && project.ExecutionType != "LEGACY") {
+        throw new InvalidUserDataException("When ExecutionType is anything other than LEGACY, TestGroup shouldn't be passed")
+    }
 
     if (project.hasProperty("TestGroup")) {
 
@@ -205,6 +208,8 @@ spoon {
         } else {
             throw new InvalidUserDataException(String.format("%s is invlaid testgroup, %s annotation itself is not present", project.TestGroup, annotationFilePath))
         }
+    } else {
+        instrumentationArgs = ["listener=com.emmasuzuki.espressospoondemo.utils.AnnotationsTestPrinter"]
     }
 
     if (project.hasProperty("InstrumentParams")) {
@@ -269,6 +274,25 @@ spoon {
     }
 
     noAnimations = true
+
+    if (project.hasProperty("ExecutionType")) {
+        println(String.format("ExecutionType is passed: %s", project.ExecutionType))
+        executionType = project.ExecutionType
+    } else {
+        executionType = "LEGACY"
+    }
+
+    if (project.hasProperty("TestSource")) {
+        println(String.format("TestSource is passed: %s", project.TestSource))
+        testSource = project.TestSource
+    }
+
+    if (project.hasProperty("Category")) {
+        println(String.format("Category is passed: %s", project.Category))
+        customDeviceEligibilityAnnotation = "com.emmasuzuki.espressospoondemo.utils.annotations." + project.Category
+    } else {
+        customDeviceEligibilityAnnotation = "com.emmasuzuki.espressospoondemo.utils.annotations.CommonCategory"
+    }
 }
 
 tasks.withType(Test) {
