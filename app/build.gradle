@@ -16,7 +16,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.jaredsburrows:gradle-spoon-plugin:2.6-SNAPSHOT'
+        classpath 'com.jaredsburrows:gradle-spoon-plugin:2.8-SNAPSHOT'
 //        classpath 'com.phonepe:app-core:1.0-SNAPSHOT'
 //        classpath 'org.jacoco:org.jacoco.core:0.8.8'
     }
@@ -49,8 +49,8 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
     androidTestImplementation 'androidx.test:core:1.5.0'
     androidTestImplementation 'androidx.test:rules:1.5.0'
-    androidTestImplementation 'com.squareup.spoon:spoon-client:3.6-SNAPSHOT'
-    androidTestImplementation 'com.squareup.spoon:spoon-internal-axmlparser:3.6-SNAPSHOT'
+    androidTestImplementation 'com.squareup.spoon:spoon-client:3.8-SNAPSHOT'
+    androidTestImplementation 'com.squareup.spoon:spoon-internal-axmlparser:3.8-SNAPSHOT'
     androidTestImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.3.0-alpha01'
     androidTestImplementation 'net.lightbody.bmp:browsermob-core:2.1.5'

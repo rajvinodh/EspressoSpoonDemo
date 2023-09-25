@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.test.internal.runner.listener.InstrumentationResultPrinter;
 import androidx.test.internal.runner.listener.InstrumentationRunListener;
 
+import com.emmasuzuki.espressospoondemo.utils.annotations.CaseId;
 import com.emmasuzuki.espressospoondemo.utils.annotations.DependeeMethod;
 import com.emmasuzuki.espressospoondemo.utils.annotations.Device;
 import com.emmasuzuki.espressospoondemo.utils.annotations.RetryRule;
@@ -45,6 +46,8 @@ public class AnnotationsTestPrinter extends InstrumentationRunListener {
                 retry = retryRule.value();
             }
 
+
+
             classComm = true;
         }
 
@@ -62,6 +65,7 @@ public class AnnotationsTestPrinter extends InstrumentationRunListener {
         boolean comm = false;
         String dependencyStr = "";
         String devicesStr = "";
+        int testrailId = Integer.MIN_VALUE;
         for (Annotation annotation : annotations) {
             if (comm) stringBuilder.append(",");
             stringBuilder.append(annotation.annotationType().getSimpleName());
@@ -76,12 +80,18 @@ public class AnnotationsTestPrinter extends InstrumentationRunListener {
                 devicesStr = buildTags(device.value());
             }
 
+            if (annotation instanceof CaseId) {
+                CaseId caseId = (CaseId) annotation;
+                testrailId = caseId.value();
+            }
+
             comm = true;
         }
 
         bundle.putString("annotations", stringBuilder.toString());
         bundle.putString("dependedMethods", dependencyStr);
         bundle.putString("deviceSerialId", devicesStr);
+        bundle.putInt("testrailId", testrailId);
         getInstrumentation().sendStatus(
                 InstrumentationResultPrinter.REPORT_VALUE_RESULT_START, bundle);
     }

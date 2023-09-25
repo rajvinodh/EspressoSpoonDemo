@@ -4,6 +4,7 @@ import org.junit.Assume;
 import org.junit.Test;;
 import com.emmasuzuki.espressospoondemo.R;
 import com.emmasuzuki.espressospoondemo.pages.LoginPage;
+import com.emmasuzuki.espressospoondemo.utils.annotations.CaseId;
 import com.emmasuzuki.espressospoondemo.utils.annotations.CommonCategory;
 import com.emmasuzuki.espressospoondemo.utils.annotations.DeviceEligibilityTest;
 import com.emmasuzuki.espressospoondemo.utils.annotations.RealDevice;
@@ -47,6 +48,7 @@ public class LoginActivityTest extends BaseTest {
 
     @RealDevice
     @Workshop
+    @CaseId(1234)
     @Test
     public void test_Invalid_Email_Error() throws IOException, InterruptedException {
 
@@ -58,6 +60,7 @@ public class LoginActivityTest extends BaseTest {
     }
 
     @Workshop
+    @CaseId(5678)
     @Test
     public void test_Empty_Password_Error() {
         loginPage = new LoginPage();
@@ -66,6 +69,7 @@ public class LoginActivityTest extends BaseTest {
                     .check(matches(hasErrorText("Please enter your password")));
     }
 
+    @CaseId(9012)
     @Workshop
     @Test
     public void test_Set_Email_Mismatch_Error() {
@@ -77,6 +81,7 @@ public class LoginActivityTest extends BaseTest {
 
     }
 
+    @CaseId(3456)
     @Workshop
     @Test
     public void test_Set_Password_Mismatch_Error() {
@@ -88,6 +93,7 @@ public class LoginActivityTest extends BaseTest {
 
     }
 
+    @CaseId(7890)
     @Workshop
     @Test
     public void test_Set_Correct_Cred() throws InterruptedException {
