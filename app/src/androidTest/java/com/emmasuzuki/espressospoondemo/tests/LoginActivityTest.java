@@ -28,7 +28,7 @@ public class LoginActivityTest extends BaseTest {
     @Workshop
     @Test
     public void eligibility () throws InterruptedException {
-//        if(getDeviceSerialID().equals("RZCW20RMPXM")) {
+//        if(getDeviceSerialID().equals("LRCQ9DZH7TJVU8FI")) {
 //            throw new RuntimeException("Custom Exception");
 //        }
 
@@ -47,7 +47,7 @@ public class LoginActivityTest extends BaseTest {
     }
 
     @RealDevice
-    @Workshop
+//    @Workshop
     @CaseId(1234)
     @Test
     public void test_Invalid_Email_Error() throws IOException, InterruptedException {
@@ -81,7 +81,7 @@ public class LoginActivityTest extends BaseTest {
 
     }
 
-    @CaseId(3456)
+    @CaseId(9011)
     @Workshop
     @Test
     public void test_Set_Password_Mismatch_Error() {
@@ -94,7 +94,7 @@ public class LoginActivityTest extends BaseTest {
     }
 
     @CaseId(7890)
-    @Workshop
+//    @Workshop
     @Test
     public void test_Set_Correct_Cred() throws InterruptedException {
         loginPage = new LoginPage();
