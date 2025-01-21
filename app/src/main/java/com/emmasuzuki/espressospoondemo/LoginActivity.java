@@ -25,12 +25,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
+import com.emmasuzuki.espressospoon.R;
+
 /**
  * Demo Login activity class
  */
 public class LoginActivity extends Activity {
 
-    private static final String DEMO_EMAIL = "phonepe@test.com";
+    private static final String DEMO_EMAIL = "me@phonepe.com";
     private static final String DEMO_PASSWORD = "phonepe";
 
     private EditText mEmail, mPassword;
